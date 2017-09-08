@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/home/kevin/flightcontrol/app/build/intermediates/res/merged/debug/mipmap-hdpi/ic_launcher_round.png",
+        "source": "/home/kevin/flightcontrol/app/src/main/res/mipmap-hdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "/home/kevin/flightcontrol/app/build/intermediates/res/merged/debug/mipmap-hdpi/ic_launcher.png",
+        "source": "/home/kevin/flightcontrol/app/src/main/res/mipmap-hdpi/ic_launcher.png"
+    }
+]
