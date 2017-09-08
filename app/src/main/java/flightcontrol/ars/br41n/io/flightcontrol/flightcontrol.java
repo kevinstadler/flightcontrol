@@ -1,5 +1,7 @@
 package flightcontrol.ars.br41n.io.flightcontrol;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -17,6 +19,7 @@ public class flightcontrol extends AppCompatActivity implements ParrotEventListe
 
     private ExtendiXItemReceiver brain;
     private ParrotDrone drone;
+    private ParrotVideoView videoStream;
 
     // called when the android app is backgrounded
     @Override
@@ -42,8 +45,9 @@ public class flightcontrol extends AppCompatActivity implements ParrotEventListe
             this.brain.AttachEventListener(this);
             this.brain.BeginReceiving(12345);
 
-            ParrotVideoView video = (ParrotVideoView) findViewById(R.id.videoView);
-            this.drone = new ParrotDrone(this.getApplicationContext(), video);
+            // retrieve video component from XML
+            this.videoStream = (ParrotVideoView) findViewById(R.id.videoView);
+            this.drone = new ParrotDrone(this.getApplicationContext(), this.videoStream);
 
             this.drone.AttachEventListener(this);
 
@@ -154,6 +158,16 @@ public class flightcontrol extends AppCompatActivity implements ParrotEventListe
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isFaceInFrame() {
+        Bitmap bitmap = Bitmap.createBitmap(this.videoStream.getWidth(), this.videoStream.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        this.videoStream.draw(canvas);
+        int[] pixels = null; // FIXME korrekte groesse?
+        bitmap.getPixels(pixels, 0, 0, 0, 0, bitmap.getWidth(), bitmap.getHeight());
+        // TODO pass pixels array on to face recognition
+        return false;
     }
 
     // these two only get called by non-"KEY_" items
