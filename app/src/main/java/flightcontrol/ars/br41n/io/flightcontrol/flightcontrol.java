@@ -42,7 +42,7 @@ public class flightcontrol extends AppCompatActivity implements ParrotEventListe
             this.brain.AttachEventListener(this);
             this.brain.BeginReceiving(12345);
 
-            ParrotVideoView video = new ParrotVideoView(this.getApplicationContext());
+            ParrotVideoView video = (ParrotVideoView) findViewById(R.id.videoView);
             this.drone = new ParrotDrone(this.getApplicationContext(), video);
 
             this.drone.AttachEventListener(this);
