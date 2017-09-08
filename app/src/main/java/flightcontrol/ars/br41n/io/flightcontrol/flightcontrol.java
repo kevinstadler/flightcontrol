@@ -83,6 +83,8 @@ public class flightcontrol extends AppCompatActivity implements ParrotEventListe
         Log.i("connection", "Drone connection state changed: " + parrotConnectionStates.toString());
         if (parrotConnectionStates == ParrotConnectionStates.CONNECTED) {
             try {
+                this.drone.StartVideo();
+                // we can't even be sure what state the drone is in when we connect but let's take off anyway
                 this.drone.TakeOff();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -115,8 +117,46 @@ public class flightcontrol extends AppCompatActivity implements ParrotEventListe
     }
 
     // EXTENDIX METHODS HERE
+    @Override
+    public void OnItemReceived(String s) {
+        Log.i("extendix", "Received command: " + s);
 
-    // this is the one that gets called
+        // duration of the command (per recognised key)
+        int timeMs = 100;
+
+        try {
+            if (s.equals("KEY_LAND")) {
+                this.drone.Land();
+            } else if (s.equals("KEY_TAKEOFF")) {
+                this.drone.TakeOff();
+            } else if (s.equals("KEY_FORWARD")) {
+                this.drone.Pitch((byte) 20, timeMs);
+            } else if (s.equals("KEY_BACK")) {
+                this.drone.Pitch((byte) -20, timeMs);
+
+            // Yaw() == rotation
+            } else if (s.equals("KEY_CW")) {
+                this.drone.Yaw((byte) 20, timeMs);
+            } else if (s.equals("KEY_CCW")) {
+                this.drone.Yaw((byte) -20, timeMs);
+
+            // Roll() == 'strafing'
+            } else if (s.equals("KEY_LEFT")) {
+                this.drone.Roll((byte) -20, timeMs);
+            } else if (s.equals("KEY_RIGHT")) {
+                this.drone.Roll((byte) 20, timeMs);
+
+            } else if (s.startsWith("KEY_FACE")) {
+                // TODO start a subroutine which keeps moving until the face recognition interrupts
+            } else {
+                Log.w("extendix", "Unknown command: " + s);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // these two only get called by non-"KEY_" items
     @Override
     public void OnItemUnknownIntendix(String s) {
         Log.d("extendix", "Unknown: " + s);
@@ -127,8 +167,4 @@ public class flightcontrol extends AppCompatActivity implements ParrotEventListe
         Log.w("extendix", "Unknown UDP: " + s);
     }
 
-    @Override
-    public void OnItemReceived(String s) {
-        Log.i("extendix", "Executing command: " + s);
-    }
 }
