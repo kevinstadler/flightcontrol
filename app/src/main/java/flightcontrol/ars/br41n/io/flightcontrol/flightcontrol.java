@@ -18,6 +18,19 @@ public class flightcontrol extends AppCompatActivity implements ParrotEventListe
     private ExtendiXItemReceiver brain;
     private ParrotDrone drone;
 
+    // called when the android app is backgrounded
+    @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            // disconnect (which should emergency land the drone in the process)
+            this.drone.Close();
+            this.brain.EndReceiving();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("main", "Starting up");
@@ -25,7 +38,7 @@ public class flightcontrol extends AppCompatActivity implements ParrotEventListe
         setContentView(R.layout.activity_flightcontrol);
 
         try {
-            this.brain = new ExtendiXItemReceiver("TODO", this.getApplicationContext());
+            this.brain = new ExtendiXItemReceiver("KEY", this.getApplicationContext());
             this.brain.AttachEventListener(this);
             this.brain.BeginReceiving(12345);
 
@@ -89,9 +102,7 @@ public class flightcontrol extends AppCompatActivity implements ParrotEventListe
         if (parrotFlyingStates == ParrotFlyingStates.HOVERING) {
             Log.i("flight", "Achieved hovering, landing again");
             try {
-                this.drone.EmergencyLanding();
                 this.drone.Land();
-                this.drone.Close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -108,15 +119,7 @@ public class flightcontrol extends AppCompatActivity implements ParrotEventListe
     // this is the one that gets called
     @Override
     public void OnItemUnknownIntendix(String s) {
-        int commandBeginning = s.indexOf("KEY_");
-        if (commandBeginning == -1) {
-            Log.w("extendix", "Unknown: " + s);
-        } else {
-            // something like this
-            String command = s.substring(commandBeginning + 3, commandBeginning + 7);
-            Log.i("extendix", "Executing command: " + command);
-            // TODO
-        }
+        Log.d("extendix", "Unknown: " + s);
     }
 
     @Override
@@ -126,6 +129,6 @@ public class flightcontrol extends AppCompatActivity implements ParrotEventListe
 
     @Override
     public void OnItemReceived(String s) {
-        Log.i("extendix", s);
+        Log.i("extendix", "Executing command: " + s);
     }
 }
